@@ -49,11 +49,17 @@ body.dark  {background:#1e1e1e; color:#eee;}
 .user-input { color:#00688B; }
 .err-line { color:red; }
 
-/* Colors for dark/light */
+/* Dark mode colors */
 body.dark #paneOutput { background:#111; color:#0f0; }
-body.light #paneOutput { background:#fff; color:#000; }
 body.dark .output-line { color:lime; }
-body.light .output-line { color:#006400; }
+body.dark .prompt { color:#0f0; }
+body.dark .user-input { color:lime; }
+
+/* Light mode colors (only for running output) */
+body.light #paneOutput { background:#fff; color:#000; }
+body.light .prompt { color: #FF4500; }        /* orange prompt */
+body.light .user-input { color: #1E90FF; }   /* dodger blue input */
+body.light .output-line { color: #228B22; }  /* forest green output */
 
 /* Toolbar */
 .toolbar {
@@ -154,6 +160,7 @@ print("Numbers:", nums)
 
   function runCode(){
     outputDiv.innerHTML = "";
+    appendOutput("Output:"); // Add "Output:" at the top
     const code = editor.getValue();
     Sk.configure({
       output: text=> appendOutput(text),
