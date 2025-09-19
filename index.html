@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
   <title>Python Compiler</title>
 
   <!-- CodeMirror -->
@@ -26,15 +26,19 @@
     #split {height:100%; display:flex; flex-direction:column;}
     .pane {overflow:auto;}
 
+    /* Prevent zoom on mobile inputs */
+    textarea, input { font-size:16px !important; }
+
     /* Editor area */
     #editor {height:100%;}
-    .CodeMirror { height:100%; padding-top:1cm; box-sizing:border-box; }
+    .CodeMirror { height:100%; padding-top:1cm; box-sizing:border-box; font-size:16px; }
 
     /* Divider (single thick border) */
     .gutter {
       background:#666;
       cursor:row-resize;
       height:8px;
+      touch-action:none; /* ✅ allow finger drag on mobile */
     }
 
     /* Output wrapper */
@@ -73,14 +77,21 @@
       background:none; border:none; cursor:pointer; font-size:18px; color:white;
     }
     body.light .toolbar button { color:black; }
+
+    /* ✅ Make Run button bigger */
+    #runBtn {
+      font-size:22px;
+      font-weight:bold;
+      padding:6px 10px;
+    }
   </style>
 </head>
 <body class="dark">
   <div class="toolbar">
+    <button id="runBtn" title="Run (Ctrl+Enter)">▶</button>
     <button id="themeBtn" title="Toggle Theme">🌙</button>
     <button id="zoomInBtn" title="Increase Text Size">🔼</button>
     <button id="zoomOutBtn" title="Decrease Text Size">🔽</button>
-    <button id="runBtn" title="Run (Ctrl+Enter)">▶</button>
   </div>
 
   <div id="split">
