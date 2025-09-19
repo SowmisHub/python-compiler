@@ -46,20 +46,23 @@ body.dark  {background:#1e1e1e; color:#eee;}
 }
 .output-line { margin:0; }
 .prompt { display:inline; }
-.user-input { color:#00688B; display:inline; outline:none; border:none; } /* inline, no box */
+.user-input { color:#00688B; display:inline; outline:none; border:none; }
 .err-line { color:red; }
+.output-title { font-weight:bold; }
 
 /* Dark mode colors */
 body.dark #paneOutput { background:#111; color:#0f0; }
 body.dark .output-line { color:lime; }
-body.dark .prompt { color:#0f0; }
+body.dark .prompt { color:red; }  /* prompt color changed to red in dark mode */
 body.dark .user-input { color:lime; }
+body.dark .output-title { color:#00ffff; }
 
-/* Light mode colors (only for running output) */
+/* Light mode colors */
 body.light #paneOutput { background:#fff; color:#000; }
-body.light .prompt { color: #FF4500; }        /* orange prompt */
-body.light .user-input { color: #1E90FF; }   /* dodger blue input */
-body.light .output-line { color: #228B22; }  /* forest green output */
+body.light .prompt { color: #FF4500; }
+body.light .user-input { color: #1E90FF; }
+body.light .output-line { color: #228B22; }
+body.light .output-title { color:#00008b; }
 
 /* Toolbar */
 .toolbar {
@@ -71,7 +74,7 @@ body.light .toolbar button { color:black; }
 #runBtn { font-size:26px; }
 
 /* Spacer below toolbar */
-.toolbar-spacer { height:40px; } /* Adjust height of empty space as needed */
+.toolbar-spacer { height:40px; }
 </style>
 </head>
 <body class="dark">
@@ -114,27 +117,23 @@ print("Numbers:", nums)
   const outputDiv = document.getElementById('paneOutput');
   let inputResolve = null;
 
-  // Append a new output line
   function appendOutput(text, cls="output-line"){
     const div = document.createElement('div');
-    div.className = cls;
+    if(text==="Output:") div.className = "output-title"; else div.className = cls;
     div.textContent = text;
     outputDiv.appendChild(div);
     outputDiv.scrollTop = outputDiv.scrollHeight;
     return div;
   }
 
-  // Input function for Skulpt (inline, no box)
   function inputfun(promptText){
     return new Promise(resolve=>{
       const line = document.createElement('div');
       line.className = 'output-line';
-      // Prompt span
       const promptSpan = document.createElement('span');
       promptSpan.className = 'prompt';
       promptSpan.textContent = promptText;
       line.appendChild(promptSpan);
-      // Input span (inline editable)
       const inputSpan = document.createElement('span');
       inputSpan.className = 'user-input';
       inputSpan.contentEditable = true;
@@ -149,7 +148,7 @@ print("Numbers:", nums)
         if(e.key === 'Enter'){
           e.preventDefault();
           const value = inputSpan.textContent;
-          inputSpan.textContent = value; // show inline
+          inputSpan.textContent = value;
           inputResolve(value);
           inputResolve = null;
         }
@@ -165,7 +164,7 @@ print("Numbers:", nums)
 
   function runCode(){
     outputDiv.innerHTML = "";
-    appendOutput("Output:"); // Add "Output:" at the top
+    appendOutput("Output:");
     const code = editor.getValue();
     Sk.configure({
       output: text=> appendOutput(text),
@@ -178,14 +177,12 @@ print("Numbers:", nums)
       .catch(err=> appendOutput(err.toString(), "err-line"));
   }
 
-  // Toolbar buttons
   document.getElementById('runBtn').onclick = runCode;
   document.addEventListener("keydown", e=>{
     if((e.ctrlKey||e.metaKey) && e.key==="Enter") runCode();
   });
   document.getElementById('clearBtn').onclick = ()=> outputDiv.innerHTML = "";
 
-  // Theme toggle
   const themeBtn = document.getElementById('themeBtn');
   let dark = true;
   themeBtn.onclick = ()=>{
@@ -195,7 +192,6 @@ print("Numbers:", nums)
     themeBtn.textContent = dark?"🌙":"☀️";
   };
 
-  // Font zoom
   let fontSize = 16;
   function applyFontSize(){
     editor.getWrapperElement().style.fontSize = fontSize + "px";
