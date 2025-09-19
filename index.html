@@ -63,18 +63,20 @@ body.light .output-line { color: #228B22; }  /* forest green output */
 
 /* Toolbar */
 .toolbar {
-  position:absolute; top:10px; right:10px; z-index:10;
-  background:rgba(0,0,0,0.4); border-radius:6px; padding:6px;
+  position:absolute; top:0; right:10px; z-index:10;
   display:flex; gap:10px; align-items:center;
 }
-body.light .toolbar { background:rgba(0,0,0,0.1); }
 .toolbar button { background:none; border:none; cursor:pointer; font-size:20px; color:white; }
 body.light .toolbar button { color:black; }
 #runBtn { font-size:26px; }
+
+/* Spacer below toolbar */
+.toolbar-spacer { height:40px; } /* Adjust height of empty space as needed */
 </style>
 </head>
 <body class="dark">
 
+<!-- Toolbar buttons top-right -->
 <div class="toolbar">
   <button id="runBtn" title="Run (Ctrl+Enter)">▶</button>
   <button id="themeBtn" title="Toggle Theme">🌙</button>
@@ -82,6 +84,9 @@ body.light .toolbar button { color:black; }
   <button id="zoomOutBtn" title="Decrease Text Size">🔽</button>
   <button id="clearBtn" title="Clear Output">🧹</button>
 </div>
+
+<!-- Empty row / spacer below toolbar -->
+<div class="toolbar-spacer"></div>
 
 <div id="split">
   <div id="paneEditor" class="pane"><textarea id="editor"></textarea></div>
