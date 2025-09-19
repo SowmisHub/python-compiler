@@ -46,7 +46,7 @@ body.dark  {background:#1e1e1e; color:#eee;}
 }
 .output-line { margin:0; }
 .prompt { display:inline; }
-.user-input { color:#00688B; }
+.user-input { color:#00688B; display:inline; outline:none; border:none; } /* inline, no box */
 .err-line { color:red; }
 
 /* Dark mode colors */
@@ -124,7 +124,7 @@ print("Numbers:", nums)
     return div;
   }
 
-  // Input function for Skulpt
+  // Input function for Skulpt (inline, no box)
   function inputfun(promptText){
     return new Promise(resolve=>{
       const line = document.createElement('div');
@@ -134,7 +134,7 @@ print("Numbers:", nums)
       promptSpan.className = 'prompt';
       promptSpan.textContent = promptText;
       line.appendChild(promptSpan);
-      // Input span (editable)
+      // Input span (inline editable)
       const inputSpan = document.createElement('span');
       inputSpan.className = 'user-input';
       inputSpan.contentEditable = true;
