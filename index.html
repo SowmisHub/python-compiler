@@ -1,171 +1,197 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-  <title>Python Compiler</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Python Terminal</title>
 
-  <!-- CodeMirror -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.css"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/material-darker.min.css"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/eclipse.min.css"/>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/python/python.min.js"></script>
+<!-- CodeMirror -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/material-darker.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/eclipse.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/python/python.min.js"></script>
 
-  <!-- Split.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.6.0/split.min.js"></script>
+<!-- Split.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.6.0/split.min.js"></script>
 
-  <!-- Skulpt -->
-  <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
+<!-- Skulpt -->
+<script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
 
-  <style>
-    html,body {height:100%; margin:0;}
-    body.light {background:#f9f9f9; color:#222;}
-    body.dark  {background:#1e1e1e; color:#eee;}
-    #split {height:100%; display:flex; flex-direction:column;}
-    .pane {overflow:auto;}
+<style>
+html,body {height:100%; margin:0;}
+body.light {background:#f9f9f9; color:#222;}
+body.dark  {background:#1e1e1e; color:#eee;}
+#split {height:100%; display:flex; flex-direction:column;}
+.pane {overflow:auto;}
 
-    /* Prevent zoom on mobile inputs */
-    textarea, input { font-size:16px !important; }
+/* Editor */
+#editor {height:100%;}
+.CodeMirror { height:100%; padding-top:1cm; box-sizing:border-box; font-size:16px; }
 
-    /* Editor area */
-    #editor {height:100%;}
-    .CodeMirror { height:100%; padding-top:1cm; box-sizing:border-box; font-size:16px; }
+/* Divider */
+.gutter {background:#666; cursor:row-resize; height:8px; touch-action:none;}
 
-    /* Divider (single thick border) */
-    .gutter {
-      background:#666;
-      cursor:row-resize;
-      height:8px;
-      touch-action:none; /* ✅ allow finger drag on mobile */
-    }
+/* Output */
+#paneOutput {
+  padding:6px 12px;
+  box-sizing:border-box;
+  font-family:monospace;
+  font-size:16px;
+  white-space:pre-wrap;
+  outline:none;
+  overflow-y:auto;
+  height:100%;
+}
+.output-line { margin:0; }
+.prompt { display:inline; }
+.user-input { color:#00688B; }
+.err-line { color:red; }
 
-    /* Output wrapper */
-    #paneOutput {
-      display:flex;
-      align-items:flex-start;
-      padding:12px;
-      box-sizing:border-box;
-      font-size:16px;
-      font-family:monospace;
-      white-space:pre-wrap;
-    }
+/* Colors for dark/light */
+body.dark #paneOutput { background:#111; color:#0f0; }
+body.light #paneOutput { background:#fff; color:#000; }
+body.dark .output-line { color:lime; }
+body.light .output-line { color:#006400; }
 
-    /* Label */
-    #outputLabel {
-      font-weight:bold;
-      margin-right:8px;
-    }
-
-    /* Output area */
-    #output {
-      flex:1;
-    }
-
-    body.dark #paneOutput { background:#111; color:#0f0; }
-    body.light #paneOutput { background:#fff; color:#000; }
-
-    /* Toolbar */
-    .toolbar {
-      position:absolute; top:10px; right:10px; z-index:10;
-      background:rgba(0,0,0,0.4); border-radius:6px; padding:4px;
-      display:flex; gap:6px;
-    }
-    body.light .toolbar { background:rgba(0,0,0,0.1); }
-    .toolbar button {
-      background:none; border:none; cursor:pointer; font-size:18px; color:white;
-    }
-    body.light .toolbar button { color:black; }
-
-    /* ✅ Make Run button bigger */
-    #runBtn {
-      font-size:22px;
-      font-weight:bold;
-      padding:6px 10px;
-    }
-  </style>
+/* Toolbar */
+.toolbar {
+  position:absolute; top:10px; right:10px; z-index:10;
+  background:rgba(0,0,0,0.4); border-radius:6px; padding:6px;
+  display:flex; gap:10px; align-items:center;
+}
+body.light .toolbar { background:rgba(0,0,0,0.1); }
+.toolbar button { background:none; border:none; cursor:pointer; font-size:20px; color:white; }
+body.light .toolbar button { color:black; }
+#runBtn { font-size:26px; }
+</style>
 </head>
 <body class="dark">
-  <div class="toolbar">
-    <button id="runBtn" title="Run (Ctrl+Enter)">▶</button>
-    <button id="themeBtn" title="Toggle Theme">🌙</button>
-    <button id="zoomInBtn" title="Increase Text Size">🔼</button>
-    <button id="zoomOutBtn" title="Decrease Text Size">🔽</button>
-  </div>
 
-  <div id="split">
-    <div id="paneEditor" class="pane"><textarea id="editor"></textarea></div>
-    <div id="paneOutput" class="pane">
-      <div id="outputLabel">Output:</div>
-      <div id="output"></div>
-    </div>
-  </div>
+<div class="toolbar">
+  <button id="runBtn" title="Run (Ctrl+Enter)">▶</button>
+  <button id="themeBtn" title="Toggle Theme">🌙</button>
+  <button id="zoomInBtn" title="Increase Text Size">🔼</button>
+  <button id="zoomOutBtn" title="Decrease Text Size">🔽</button>
+  <button id="clearBtn" title="Clear Output">🧹</button>
+</div>
+
+<div id="split">
+  <div id="paneEditor" class="pane"><textarea id="editor"></textarea></div>
+  <div id="paneOutput" class="pane" tabindex="0"></div>
+</div>
 
 <script>
   // Split.js
-  Split(['#paneEditor','#paneOutput'], {
-    direction:'vertical',
-    sizes:[70,30],
-    minSize:100,
-    gutterSize:8
-  });
+  Split(['#paneEditor','#paneOutput'], { direction:'vertical', sizes:[70,30], minSize:100, gutterSize:8 });
 
   // CodeMirror
   const editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
-    mode:'python',
-    theme:'material-darker',
-    lineNumbers:true,
-    indentUnit:4
+    mode:'python', theme:'material-darker', lineNumbers:true, indentUnit:4
   });
-  editor.setValue('print("Hello from Python!")\nfor i in range(5):\n    print("Line", i+1)');
+  editor.setValue(`# Example Python program
+name = input("Enter your name: ")
+age = int(input("Enter your age: "))
+nums = list(map(int, input("Enter 3 numbers separated by space: ").split()))
 
-  // Skulpt runner
+print("Hello", name)
+print("You are", age, "years old")
+print("Numbers:", nums)
+`);
+
+  const outputDiv = document.getElementById('paneOutput');
+  let inputResolve = null;
+
+  // Append a new output line
+  function appendOutput(text, cls="output-line"){
+    const div = document.createElement('div');
+    div.className = cls;
+    div.textContent = text;
+    outputDiv.appendChild(div);
+    outputDiv.scrollTop = outputDiv.scrollHeight;
+    return div;
+  }
+
+  // Input function for Skulpt
+  function inputfun(promptText){
+    return new Promise(resolve=>{
+      const line = document.createElement('div');
+      line.className = 'output-line';
+      // Prompt span
+      const promptSpan = document.createElement('span');
+      promptSpan.className = 'prompt';
+      promptSpan.textContent = promptText;
+      line.appendChild(promptSpan);
+      // Input span (editable)
+      const inputSpan = document.createElement('span');
+      inputSpan.className = 'user-input';
+      inputSpan.contentEditable = true;
+      inputSpan.spellcheck = false;
+      line.appendChild(inputSpan);
+      outputDiv.appendChild(line);
+      inputSpan.focus();
+      outputDiv.scrollTop = outputDiv.scrollHeight;
+
+      inputResolve = resolve;
+      inputSpan.addEventListener('keydown', e=>{
+        if(e.key === 'Enter'){
+          e.preventDefault();
+          const value = inputSpan.textContent;
+          inputSpan.textContent = value; // show inline
+          inputResolve(value);
+          inputResolve = null;
+        }
+      });
+    });
+  }
+
   function builtinRead(x){
     if(Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
       throw "File not found: '" + x + "'";
     return Sk.builtinFiles["files"][x];
   }
+
   function runCode(){
-    let code = editor.getValue();
-    let out = document.getElementById("output");
-    out.innerHTML="";
-    function outf(text){ out.innerHTML += text; }
-    Sk.configure({output:outf, read:builtinRead});
-    Sk.misceval.asyncToPromise(()=>Sk.importMainWithBody("<stdin>",false,code,true));
+    outputDiv.innerHTML = "";
+    const code = editor.getValue();
+    Sk.configure({
+      output: text=> appendOutput(text),
+      read: builtinRead,
+      inputfun: inputfun,
+      inputfunTakesPrompt: true,
+      __future__: Sk.python3
+    });
+    Sk.misceval.asyncToPromise(()=>Sk.importMainWithBody("<stdin>", false, code, true))
+      .catch(err=> appendOutput(err.toString(), "err-line"));
   }
 
-  // Buttons & shortcuts
-  document.getElementById('runBtn').onclick=runCode;
+  // Toolbar buttons
+  document.getElementById('runBtn').onclick = runCode;
   document.addEventListener("keydown", e=>{
     if((e.ctrlKey||e.metaKey) && e.key==="Enter") runCode();
   });
+  document.getElementById('clearBtn').onclick = ()=> outputDiv.innerHTML = "";
 
   // Theme toggle
-  const themeBtn=document.getElementById('themeBtn');
-  let dark=true;
-  themeBtn.onclick=()=>{
-    dark=!dark;
-    document.body.className=dark?"dark":"light";
+  const themeBtn = document.getElementById('themeBtn');
+  let dark = true;
+  themeBtn.onclick = ()=>{
+    dark = !dark;
+    document.body.className = dark?"dark":"light";
     editor.setOption("theme", dark?"material-darker":"eclipse");
     themeBtn.textContent = dark?"🌙":"☀️";
   };
 
-  // Font size control
-  let fontSize=16;
-  const output=document.getElementById('output');
-  const paneOutput=document.getElementById('paneOutput');
+  // Font zoom
+  let fontSize = 16;
   function applyFontSize(){
-    editor.getWrapperElement().style.fontSize=fontSize+"px";
+    editor.getWrapperElement().style.fontSize = fontSize + "px";
     editor.refresh();
-    paneOutput.style.fontSize=fontSize+"px";
+    outputDiv.style.fontSize = fontSize + "px";
   }
-  document.getElementById('zoomInBtn').onclick=()=>{
-    fontSize+=2; applyFontSize();
-  };
-  document.getElementById('zoomOutBtn').onclick=()=>{
-    if(fontSize>8){ fontSize-=2; applyFontSize(); }
-  };
+  document.getElementById('zoomInBtn').onclick = ()=>{ fontSize+=2; applyFontSize(); };
+  document.getElementById('zoomOutBtn').onclick = ()=>{ if(fontSize>8){ fontSize-=2; applyFontSize(); } };
   applyFontSize();
 </script>
 </body>
